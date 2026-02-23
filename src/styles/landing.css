@@ -1,0 +1,233 @@
+/* ===================================
+   Landing – Unified Splash + Menu
+   =================================== */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+/* ---------- Shell ---------- */
+.landing {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #040408;
+}
+
+/* ---------- Background aurora ---------- */
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.aurora-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.aurora-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Center content ---------- */
+.landing-center {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 0;
+}
+
+/* HIKAGEN title – always same position */
+.landing-center h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  margin-right: -0.24em;
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 28px;
+  text-shadow: 0 0 2px rgba(255, 255, 255, .25);
+  line-height: 1;
+}
+
+/* Glass nav menu */
+.glass-menu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .10);
+  backdrop-filter: blur(14px);
+}
+
+.glass-menu a {
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-family: 'Sora', sans-serif;
+  font-size: .82rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, .7);
+  text-decoration: none;
+  transition: background .25s, color .25s;
+}
+
+.glass-menu a:hover {
+  background: rgba(255, 255, 255, .10);
+  color: #fff;
+}
+
+/* ---------- Reveal animation for menu elements ---------- */
+.glass-menu {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.landing--ready .glass-menu {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.3s;
+}
+
+/* HIKAGEN stays fully visible under cloud layer title */
+.landing-center h1 {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.landing--ready .landing-center h1 {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+/* ---------- Cloud overlay layer ---------- */
+.cloud-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  transition: opacity 1s ease, filter 1s ease;
+}
+
+.cloud-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.cloud-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Cloud text overlay – HIKAGEN duplicate that matches position */
+.cloud-text-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cloud-text-overlay h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  margin-right: -0.24em;
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-shadow: 0 0 2px rgba(255, 255, 255, .25);
+  line-height: 1;
+}
+
+.cloud-text-overlay p {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: clamp(0.85rem, 1.8vw, 1.05rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  letter-spacing: 0.04em;
+  margin-top: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Phase: loading – cloud layer opaque, nothing visible yet */
+.landing--loading .cloud-layer {
+  opacity: 1;
+  filter: none;
+}
+
+.landing--loading .cloud-text-overlay h1,
+.landing--loading .cloud-text-overlay p {
+  opacity: 0;
+}
+
+/* Phase: intro – clouds visible, text fades in */
+.landing--intro .cloud-layer {
+  opacity: 1;
+  filter: none;
+}
+
+.landing--intro .cloud-text-overlay h1 {
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+.landing--intro .cloud-text-overlay p {
+  opacity: 1;
+  transition: opacity 0.8s ease 0.3s;
+}
+
+/* Phase: revealing – clouds fade out */
+.landing--revealing .cloud-layer {
+  opacity: 0;
+  filter: blur(8px);
+}
+
+.landing--revealing .cloud-text-overlay p {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .glass-menu {
+    flex-direction: column;
+    border-radius: 20px;
+    padding: 10px;
+    gap: 4px;
+    width: calc(100% - 48px);
+    max-width: 320px;
+  }
+
+  .glass-menu a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .menu-divider {
+    width: 80%;
+    height: 1px;
+    margin: 2px auto;
+  }
+
+  .menu-login-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .orb-left  { width: 200px; height: 200px; }
+  .orb-right { width: 160px; height: 160px; }
+}

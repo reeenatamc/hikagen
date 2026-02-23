@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap');
+
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #326696;
+}
+
+.splash-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  transition: opacity 850ms ease, filter 850ms ease;
+}
+
+.splash-canvas canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.splash-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #f2f7ff;
+  padding: 1rem;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  font-family: 'Sora', Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+.splash-brand {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  width: min(90vw, 980px);
+  margin: 0 auto;
+  transition: transform 900ms ease, opacity 600ms ease;
+}
+
+.splash-overlay h1 {
+  margin: 0;
+  letter-spacing: 0.24em;
+  font-size: clamp(2.4rem, 8vw, 6rem);
+  line-height: 1;
+  font-weight: 800;
+  margin-right: -0.24em;
+}
+
+.splash-overlay p {
+  margin: 0;
+  font-size: clamp(1rem, 2.2vw, 1.6rem);
+  font-weight: 400;
+  font-family: Helvetica, Arial, sans-serif;
+  width: 100%;
+  max-width: 100%;
+  line-height: 1.35;
+  transition: opacity 500ms ease, transform 700ms ease;
+}
+
+.splash-menu {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 0.25rem;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 550ms ease, transform 650ms ease;
+}
+
+.splash-menu a {
+  color: #eaf4ff;
+  text-decoration: none;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.splash-overlay.is-transitioning .splash-brand p {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.splash-overlay.is-transitioning .splash-menu {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.splash-screen.is-exiting .splash-canvas {
+  opacity: 0;
+  filter: blur(2px);
+}
+
+.splash-screen.is-exiting .splash-overlay {
+  opacity: 0;
+  transition: opacity 450ms ease;
+}

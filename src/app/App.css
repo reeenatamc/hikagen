@@ -1,14 +1,2 @@
-#root {
-  margin: 0 auto;
-  padding: 2rem;
-  max-width: 900px;
-}
+/* App shell – no layout needed, Landing handles everything */
 
-.app {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.hint {
-  opacity: 0.8;
-}
