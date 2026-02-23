@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { centralMenuLinks } from '../constants/centralMenuLinks'
+import ParticleGlobe from '../components/ParticleGlobe'
+import FloatingGeometry from '../components/FloatingGeometry'
+import NetworkGraph from '../components/NetworkGraph'
 import '../styles/landing.css'
 
 const cloudShader = {
@@ -109,10 +112,10 @@ const auroraShader = {
       float tendrils = tendril * tendrilMask;
 
       // color layers
-      vec3 coreColor = vec3(0.85, 0.93, 1.0);        // white-blue
-      vec3 midColor  = vec3(0.35, 0.7, 1.0);          // celeste
-      vec3 wideColor = vec3(0.12, 0.35, 0.75);         // deep blue
-      vec3 tendrilColor = vec3(0.5, 0.8, 1.0);
+      vec3 coreColor = vec3(0.88, 0.86, 1.0);        // white-indigo
+      vec3 midColor  = vec3(0.39, 0.40, 0.95);         // indigo
+      vec3 wideColor = vec3(0.18, 0.15, 0.55);         // deep indigo
+      vec3 tendrilColor = vec3(0.55, 0.55, 0.98);
 
       vec3 col = coreColor * core
                + midColor * mid
@@ -132,6 +135,7 @@ const auroraShader = {
 function Landing() {
   const cloudRef = useRef(null)
   const auroraRef = useRef(null)
+  const landingRef = useRef(null)
   const hasSeenIntro = window.localStorage.getItem('hikagen-intro-seen') === '1'
 
   const [phase, setPhase] = useState(hasSeenIntro ? 'ready' : 'loading')
@@ -149,6 +153,24 @@ function Landing() {
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [])
+
+  /* ---------- Scroll-triggered reveal (IntersectionObserver) ---------- */
+  useEffect(() => {
+    if (phase !== 'ready') return undefined
+    const targets = document.querySelectorAll('.landing-section, .slide-gradient')
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed')
+          }
+        })
+      },
+      { threshold: 0.12 },
+    )
+    targets.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [phase])
 
   /* ---------- Three.js aurora ray background ---------- */
   useEffect(() => {
@@ -356,35 +378,249 @@ function Landing() {
   const showClouds = phase === 'loading' || phase === 'intro' || phase === 'revealing'
 
   return (
-    <div className={`landing landing--${phase}`}>
-      {/* Background layer – Three.js aurora ray */}
+    <div ref={landingRef} className={`landing landing--${phase}`}>
+      {/* Background layer – Three.js aurora ray (fixed) */}
       <div className="landing-bg" aria-hidden="true">
         <div ref={auroraRef} className="aurora-canvas" />
       </div>
 
-      {/* Center content: always in same position */}
-      <div className="landing-center">
-        <h1>HIKAGEN</h1>
+      {/* ====== HERO (first screen) ====== */}
+      <section className="landing-hero">
+        <div className="landing-center">
+          <h1>HIKAGEN</h1>
 
-        <nav className="glass-menu" aria-label="Menú principal">
-          {centralMenuLinks.map((link) => (
-            <a key={link.href} href={link.href}>
-              {link.label}
-            </a>
-          ))}
-        </nav>
-      </div>
+          <nav className="glass-menu" aria-label="Menú principal">
+            {centralMenuLinks.map((link) => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </div>
 
-      {/* Cloud overlay: sits on top, fades away */}
-      {showClouds && (
-        <div className="cloud-layer">
-          <div ref={cloudRef} className="cloud-canvas" />
-          <div className="cloud-text-overlay">
-            <h1>HIKAGEN</h1>
-            <p>Innovamos la educación, porque el límite es el cielo.</p>
+        <div className="scroll-indicator" aria-hidden="true">
+          <span>Scroll</span>
+          <div className="scroll-arrow" />
+        </div>
+
+        {/* Cloud overlay: sits on top, fades away */}
+        {showClouds && (
+          <div className="cloud-layer">
+            <div ref={cloudRef} className="cloud-canvas" />
+            <div className="cloud-text-overlay">
+              <h1>HIKAGEN</h1>
+              <p>Innovamos la educación, porque el límite es el cielo.</p>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* ====== SLIDE 2 – Gradient + Globe ====== */}
+        <section className="slide-gradient slide-network">
+          <div className="slide-gradient-content">
+            <div className="slide-gradient-text">
+              <span className="badge badge-dark">Conexión educativa</span>
+              <h2>Gestión escolar conectada</h2>
+              <p>
+                Un ecosistema donde escuelas, docentes y familias están interconectados.
+                Visualiza tu red, comparte datos y colabora en tiempo real.
+              </p>
+              <div className="stats-row">
+                <div className="stat">
+                  <strong>24</strong>
+                  <span>Nodos activos</span>
+                </div>
+                <div className="stat">
+                  <strong>+120</strong>
+                  <span>Conexiones</span>
+                </div>
+                <div className="stat">
+                  <strong>99.9%</strong>
+                  <span>Uptime</span>
+                </div>
+              </div>
+            </div>
+            <div className="network-graph-wrapper">
+              <NetworkGraph nodeCount={24} />
+            </div>
+          </div>
+        </section>
+
+      {/* ====== SLIDE 3 – Features ====== */}
+      <FloatingGeometry scrollRef={landingRef} />
+      <section id="info" className="landing-section section-features">
+        <div className="section-content">
+          <span className="badge badge-dark">Funcionalidades</span>
+          <h2>Todo lo que necesitas, nada que te sobre</h2>
+          <p className="section-subtitle">
+            Herramientas diseñadas por educadores, para educadores.
+          </p>
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span className="material-symbols-outlined">dashboard</span>
+              </div>
+              <h3>Panel intuitivo</h3>
+              <p>Vista general de tu institución con métricas clave, alertas y accesos rápidos.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span className="material-symbols-outlined">school</span>
+              </div>
+              <h3>Gestión académica</h3>
+              <p>Calificaciones, horarios, materias y planes de estudio en un flujo integrado.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span className="material-symbols-outlined">group</span>
+              </div>
+              <h3>Comunicación</h3>
+              <p>Chat directo entre maestros, alumnos y padres. Notificaciones automáticas.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span className="material-symbols-outlined">bar_chart</span>
+              </div>
+              <h3>Reportes avanzados</h3>
+              <p>Análisis de rendimiento por alumno, grupo o institución con gráficas interactivas.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span className="material-symbols-outlined">fingerprint</span>
+              </div>
+              <h3>Asistencia digital</h3>
+              <p>Control de asistencia con QR, biométricos o lista manual. Todo en la nube.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span className="material-symbols-outlined">payments</span>
+              </div>
+              <h3>Cobranza automatizada</h3>
+              <p>Control de pagos, recibos digitales y recordatorios automáticos a padres.</p>
+            </div>
           </div>
         </div>
-      )}
+      </section>
+
+      {/* ====== SLIDE 4 – Pricing ====== */}
+      <section id="pricing" className="landing-section section-pricing">
+        <div className="section-content">
+          <span className="badge badge-dark">Precios</span>
+          <h2>Planes para cada institución</h2>
+          <p className="section-subtitle">
+            Sin sorpresas. Sin contratos largos. Cancela cuando quieras.
+          </p>
+          <div className="pricing-grid">
+            <div className="pricing-card">
+              <div className="pricing-header">
+                <h3>Starter</h3>
+                <p className="pricing-desc">Para escuelas pequeñas</p>
+              </div>
+              <div className="pricing-price">
+                <span className="price-amount">$29</span>
+                <span className="price-period">/mes</span>
+              </div>
+              <ul className="pricing-features">
+                <li>Hasta 200 alumnos</li>
+                <li>Panel administrativo</li>
+                <li>Asistencia digital</li>
+                <li>Soporte por email</li>
+              </ul>
+              <button type="button" className="btn-pricing">Comenzar gratis</button>
+            </div>
+            <div className="pricing-card pricing-card--popular">
+              <div className="popular-tag">Más popular</div>
+              <div className="pricing-header">
+                <h3>Pro</h3>
+                <p className="pricing-desc">Para instituciones en crecimiento</p>
+              </div>
+              <div className="pricing-price">
+                <span className="price-amount">$79</span>
+                <span className="price-period">/mes</span>
+              </div>
+              <ul className="pricing-features">
+                <li>Hasta 1,000 alumnos</li>
+                <li>Todo de Starter</li>
+                <li>Reportes avanzados</li>
+                <li>Comunicación integrada</li>
+                <li>Cobranza automatizada</li>
+              </ul>
+              <button type="button" className="btn-pricing btn-pricing--primary">Comenzar gratis</button>
+            </div>
+            <div className="pricing-card">
+              <div className="pricing-header">
+                <h3>Enterprise</h3>
+                <p className="pricing-desc">Para universidades y redes</p>
+              </div>
+              <div className="pricing-price">
+                <span className="price-amount">Custom</span>
+              </div>
+              <ul className="pricing-features">
+                <li>Alumnos ilimitados</li>
+                <li>Todo de Pro</li>
+                <li>API dedicada</li>
+                <li>Soporte 24/7 prioritario</li>
+                <li>Implementación asistida</li>
+              </ul>
+              <button type="button" className="btn-pricing">Contactar ventas</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ====== SLIDE 5 – About / CTA ====== */}
+      <section id="about" className="landing-section section-about">
+        <div className="section-content">
+          <span className="badge badge-dark">Nosotros</span>
+          <h2>Creemos que el límite es el cielo</h2>
+          <p className="section-subtitle">
+            Somos un equipo de ingenieros y educadores construyendo el futuro
+            de la gestión escolar. Desde Latinoamérica para el mundo.
+          </p>
+          <div className="about-values">
+            <div className="value-item">
+              <span className="material-symbols-outlined">rocket_launch</span>
+              <h4>Innovación</h4>
+              <p>Tecnología de punta aplicada a la educación real.</p>
+            </div>
+            <div className="value-item">
+              <span className="material-symbols-outlined">handshake</span>
+              <h4>Cercanía</h4>
+              <p>Soporte humano, no bots. Estamos contigo.</p>
+            </div>
+            <div className="value-item">
+              <span className="material-symbols-outlined">shield</span>
+              <h4>Seguridad</h4>
+              <p>Datos encriptados y respaldados siempre.</p>
+            </div>
+          </div>
+          <div className="cta-block">
+            <h3>¿Listo para transformar tu institución?</h3>
+            <div className="cta-buttons">
+              <button type="button" className="btn-cta-primary">Empezar ahora</button>
+              <button type="button" className="btn-cta-secondary">Agendar demo</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    {/* ====== FOOTER ====== */}
+    <footer className="landing-footer">
+      <div className="footer-content">
+        <div className="footer-brand">
+          <span className="footer-logo">HIKAGEN</span>
+          <span className="footer-slogan">Futuro escolar, hoy.</span>
+        </div>
+        <nav className="footer-links">
+          <a href="#info">Información</a>
+          <a href="#pricing">Precios</a>
+          <a href="#about">Nosotros</a>
+        </nav>
+        <div className="footer-copy">
+          <span>© {new Date().getFullYear()} HIKAGEN. Todos los derechos reservados.</span>
+        </div>
+      </div>
+      <div className="footer-anim-bg" />
+    </footer>
     </div>
   )
 }
